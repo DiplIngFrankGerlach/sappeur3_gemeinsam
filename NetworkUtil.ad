@@ -1,0 +1,9 @@
+
+class NetworkUtil
+{
+methods:
+    int bufferToInt32(&char buffer[], int startPos);
+    void Int32ToBuffer(int value,&char buffer[],int startPos);
+
+    void UnitTest();
+};

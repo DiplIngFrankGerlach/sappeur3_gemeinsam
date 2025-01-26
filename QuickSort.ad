@@ -1,0 +1,75 @@
+
+
+generative_function[QuickSort](elemType,sorterClass)[[
+class QuickSort_@elemType@_@sorterClass@
+{
+    @sorterClass@ sorter;
+methods:
+    void sortiere(*int feld[],int anfang, int ende);
+};
+]]
+
+[[
+
+
+void QuickSort_@elemType@_@sorterClass@::sortiere(*@elemType@ feld[], int anfang, int ende)
+{
+   //var PrintfClass pfc;
+   //pfc.fstr("anfang = $ ende = $").sa(anfang).sa(ende).pr();
+   //this.drucke(feld,anfang,ende);
+   var int diff = ende - anfang;
+   if( diff < 1 )
+   {
+     return;
+   } 
+   var int links = anfang;
+   var int rechts = ende;
+   
+   var @elemType@ pivot = feld[ ende ]; 
+   rechts = ende - 1;
+
+
+
+   while( links < rechts )
+   {  
+       while( (links < ende) && ( sorter.less(feld[links],pivot) == 1) )
+       {
+          links++;
+       }
+       while( (rechts > anfang) && (sorter.less(feld[rechts],pivot) == 0) )
+       {
+          rechts = rechts - 1;
+       }
+       if( links < rechts)
+       {
+          var int tausch = feld[links];
+          feld[links] = feld[rechts];
+          feld[rechts] = tausch;
+       }
+   }
+   if( feld[links] > pivot )
+   {
+       var int tausch = feld[links];
+       feld[links] = feld[ende];
+       feld[ende] = tausch;
+   }
+   this.sortiere(feld,anfang,links - 1);
+   this.sortiere(feld,links+1,ende);
+   
+}
+
+
+]]
+
+class SorterClassInt
+{
+methods:
+   int less(int a, int b);
+};
+
+class SortGen
+{
+   generate QuickSort(int,SorterClassInt);
+
+methods:
+};

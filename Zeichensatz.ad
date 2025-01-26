@@ -1,0 +1,41 @@
+
+
+
+/* Zeichensatz fuer lateinische Buchstaben fester Breite und Hoehe.
+   +liest Zeichensatz aus Textdatei ein
+   +zeichnet in BMP-Ausgabedatei
+ */
+class Zeichensatz
+{
+    int breite;
+    int hoehe;
+    *char feld[];/* Zeichen a..zA..Z0..9+-@%#&(){} */
+    PrintfClass pfc;   
+    *String_16 spalten[];
+    SPRFile* zsDatei;
+    int groesseEinesZeichens;
+    OberBildErzeuger* BE;
+
+    int x_ausgabe;
+    int y_ausgabe;
+
+    int gesamtZahlZeichen;
+methods:
+
+    Zeichensatz();
+ 
+    int leseAusDatei(&String_16 dateiName);
+
+    void setzeBild(OberBildErzeuger* BE_i);
+
+    void setzeStelle(int x, int y); 
+
+    void zeichne(int zeichenNr);
+    void zeichne(&String_16 zeichenkette);
+
+    int leseParameter(&String_16 name,&String_16 wert);
+
+    int leseAbbild();
+    int ZeichenNachNummer(char c);
+
+};

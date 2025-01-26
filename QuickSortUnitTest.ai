@@ -1,0 +1,68 @@
+
+
+
+
+
+void QuickSortUnitTest::drucke(*int feld[],int anfang,int ende)
+{
+   var PrintfClass pfc;
+   var int i;
+   for(i=anfang; i <= ende; i++)
+   {
+      pfc.fstr("$ ").sa(feld[i]).prNoLF();
+   }
+   pfc.fstr("").pr();
+}
+
+void QuickSortUnitTest::unitTest()
+{
+    var *int feld[] = new int[20];
+
+    feld[0] = 10;
+    feld[1] = 100;
+    feld[2] = 0;
+    feld[3] = 101;
+    feld[4] = 5;
+    feld[5] = 7;
+    feld[6] = 3;
+    feld[7] = 1000;
+    feld[8] = 10;
+    feld[9] = 10;
+    feld[10] = 9;
+    feld[11] = 6;
+    feld[12] = 10;
+    feld[13] = 10;
+    feld[14] = 110;
+    feld[15] = 1;
+    feld[16] = 10;
+    feld[17] = 1;
+    feld[18] = 10;
+    feld[19] = 1;
+
+    var QuickSort_int_SorterClassInt qs;
+    qs.sortiere(feld,0,19);
+    this.drucke(feld,0,19);
+
+    var int i;
+    for(i=0; i < 20; i++)
+    {
+       feld[i] = i;
+    }
+    qs.sortiere(feld,0,19);
+    this.drucke(feld,0,19);
+
+    for(i=0; i < 20; i++)
+    {
+       feld[i] = 100 - i;
+    }
+    qs.sortiere(feld,0,19);
+    this.drucke(feld,0,19);
+
+    for(i=0; i < 20; i++)
+    {
+       feld[i] = 100;
+    }
+    qs.sortiere(feld,0,19);
+    this.drucke(feld,0,19);
+}
+

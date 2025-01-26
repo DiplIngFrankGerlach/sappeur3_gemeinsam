@@ -1,0 +1,72 @@
+
+
+class OperandOderOperator
+{
+methods:
+   virtual int isOperand();
+   virtual int isOperator();
+
+   virtual void drucke(&String_16 ausgabe);
+};
+
+class Operand extends OperandOderOperator
+{
+   int wert;
+methods:
+   virtual int isOperand();
+   virtual void drucke(&String_16 ausgabe);
+};
+
+
+class Operator extends OperandOderOperator
+{
+   char  operat;
+methods:
+   virtual int isOperator();
+   virtual void drucke(&String_16 ausgabe);
+};
+
+
+
+class Ausrechner
+{
+  Scanner* scanner;
+  generate GrowingList(OperandOderOperator);
+  generate GrowingList(Operand);
+  generate GrowingList(Operator);
+
+  GrowingList_OperandOderOperator* oopList;
+  GrowingList_Operand* operandStack;
+  GrowingList_Operator* operatorStack;
+  SPHT_String_16_int variableList;
+methods:
+   Ausrechner(&String_16  dateiname);
+   Ausrechner(String_16*  ausdruck);
+
+   void LeftExpression();
+
+   void Expression();
+
+   //alternativer Rekursiver Parser
+
+   //diese Methode muss nach dem Konstruktor gerufen werden
+   int Addition();
+
+   void setVariableValue(&String_16 varName,int value);
+
+//private Methods:
+   int Multiplication();
+   int Primary();
+
+   int werteAus();
+
+   int isHigherPrio(Operator* oprL,Operator* oprR);
+
+   void rechneSpitze();
+
+   void druckeTokenListe();
+
+   void fehler(char meldung[]);
+   
+};
+

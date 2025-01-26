@@ -1,0 +1,11 @@
+
+
+
+class QuickSortUnitTest
+{
+methods:
+   void drucke(*int feld[],int anfang,int ende);
+   void unitTest();
+};
+
+

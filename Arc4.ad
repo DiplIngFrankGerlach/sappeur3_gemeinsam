@@ -1,0 +1,17 @@
+    class ARC4
+    {
+       char sbox[256];
+       int sizeKey;
+       int prgaIndexA;
+       int prgaIndexB;
+    methods:
+       void setKey(&char k[],int size);
+       void encrypt(&char in[],&char out[],int size);
+       ARC4();
+
+
+        //protected:
+        void ksa(&char  key[]);
+        void swap(&char data[],int i ,int j);
+        void prga(&char plaintext[],&char  cipher[],int size);
+    };

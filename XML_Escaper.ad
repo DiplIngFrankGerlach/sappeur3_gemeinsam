@@ -1,0 +1,7 @@
+
+
+class XML_Escaper
+{
+methods:
+   static void escape(&String_16 zk);
+};

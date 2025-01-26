@@ -1,0 +1,10 @@
+
+
+class Hashcode
+{
+methods:
+   longlong hash(&String_16 input);
+   longlong hash(longlong input);
+
+   static void pruefeHashfunktion();
+};

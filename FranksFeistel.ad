@@ -1,0 +1,48 @@
+
+
+/*Nichlineare Funktionen fuer Feistel */
+
+class Nichtlinear
+{
+methods:
+   static void f1(longlong rechts,longlong schluessel,&longlong ergebnis);
+   static void f2(longlong rechts,longlong schluessel,&longlong ergebnis);
+   static void f3(longlong rechts,longlong schluessel,&longlong ergebnis);
+   static void f4(longlong rechts,longlong schluessel,&longlong ergebnis);
+   static void f5(longlong rechts,longlong schluessel,&longlong ergebnis);
+};
+
+
+
+/* Feistel-Blockchiffre */
+
+class FranksFeistel
+{ 
+   longlong schluessel[16];
+   char piOktets[128];
+   int betriebsBereit;
+methods:
+
+   FranksFeistel(&String_16 schluesselZK);
+
+   void setzeSchluessel(&String_16 schluesselZK);
+
+   void verschluessle(&longlong links, &longlong rechts);
+   
+};
+
+/*Quelle fuer Zufallszahlen, als Ersatz fuer rand() der libc */
+class ZufallsQuelle
+{
+    int betriebsBereit;
+    FranksFeistel* fFeistel;
+    longlong zustandLinks;
+    longlong zustandRechts;
+    int abtaster;
+    String_16 schluessel;
+methods:
+    ZufallsQuelle();
+    int gebe();
+  
+};
+

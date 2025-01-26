@@ -1,0 +1,53 @@
+
+PNGzeichner::PNGzeichner(int breite_i, int hoehe_i)
+{
+    _breite = breite_i;
+    _hoehe  = hoehe_i;
+inline_cpp[[
+    image = new png::image<png::rgb_pixel>(_breite, _hoehe);
+]]
+
+}
+
+void PNGzeichner::zeichne(int x, int y,int farbeBGR)
+{
+    if( (x >= 0) && (x < _breite) && (y >=0) && (y < _hoehe) )
+    {
+         inline_cpp[[
+            const png::rgb_pixel color(255, 0, 0);
+            (*image)[_hoehe - 1 - y][x] = color;
+         ]]
+    }
+}
+
+PNGzeichner::~PNGzeichner()
+{
+   inline_cpp[[
+      delete image;
+      image = NULL;
+   ]]
+}
+
+void PNGzeichner::schreibeDatei(&String_16 dateiname)
+{
+    var char puffer[1024];
+    dateiname.toCharArray(puffer);
+    inline_cpp[[
+       image->write(puffer._array);
+    ]]
+}
+
+void PNGzeichner::sinusTest()
+{
+    var Math m; 
+    var double frequency = 0.01 * 2.0 * 3.1415;
+    for (var int x = 0; x < _breite; x++) 
+    {
+       // Calculate the y coordinate of the sine wave
+       var double y = cast(double,(_hoehe / 2)) + 50.0 * m.sinus(frequency * cast(double,x));
+       this.zeichne(x,cast(int,y),0xFFFFFF);
+    }
+    var String_16 dn("sinus.png");
+}
+
+

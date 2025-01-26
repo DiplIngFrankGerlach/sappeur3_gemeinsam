@@ -1,0 +1,44 @@
+
+class UTF8_Wandler
+{
+    WF_Value_int utf32feld;
+    int ausgabeStelle;    
+methods:
+    UTF8_Wandler();
+
+    virtual int leseOktet(&char ausgabe); // zu ueberladende Lesefunktion
+
+
+    int leseQuelle(); //lese die gesamte Quelle bis Ende signalisiert wird
+
+    void sichereKapa(int n);
+
+
+    void schreibe(int stelle, int zeichen);
+
+    void leseZeichenAlsUTF8(int stelle, &char feld4[],&int anzahlOktets);
+
+    int groesse();//Anzahl der gelesenen Unicode Zeichen
+
+    void lese(int stelle,&int zeichen);//lese utf32
+
+    int leseFolgendeOktets(int anzahl,&int folgende);
+
+    
+
+};
+
+class UTF8DateiWandler extends UTF8_Wandler
+{
+   SPRFile* eingabe;
+methods:
+    UTF8DateiWandler(&String_16 dateiname,&int erfolg);
+
+    virtual int leseOktet(&char ausgabe);
+
+    void druckeUTF32_Zeichen();
+
+    void schreibeAlsDatei(&String_16 name);
+
+
+};

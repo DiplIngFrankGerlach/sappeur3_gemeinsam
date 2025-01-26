@@ -1,0 +1,213 @@
+
+
+longlong Hashcode::hash(&String_16 input)
+{
+    var longlong c1 =  0x9876543287654321;
+ 
+    //PI =            0x3.243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89
+    var longlong cPI  = 0x3243f6a8885a308d; 
+    var longlong cPI2 = 0x313198a2e0370734;
+    var longlong cPI3 = 0xa4093822299f31d0;
+
+    //Euler = 2.7182818284 5904523536 0287471352 6624977572 4709369995 9574966967 6277240766 
+    //         3035354759 4571382178 5251664274 2746639193 2003059921 8174135966
+
+    var longlong cE1 = 0x2718281828459045;
+    var longlong cE2 = 0x5235360287471352; 
+    var longlong cE3 = 0x6624977572470936; 
+
+    var longlong state = cE3;
+
+    var int l = input.length();
+
+    var int ld8 = l / 8;
+    var int ld8m8 = ld8 * 8;
+    for(var int i=0; i < ld8m8; i = i + 8)
+    {
+       var longlong  zeichen = 
+                           cast(longlong,input.getAt(i    )); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 1)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 2)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 3)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 4)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 5)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 6)); zeichen = zeichen << 8;
+       zeichen = zeichen + cast(longlong,input.getAt(i + 7)); 
+       //spreize den Input auf 64 bit auf
+       zeichen =  (zeichen * c1) ^ (zeichen * cE2) ;
+       state = (state ^ zeichen) ;
+       var longlong t1 = (state << 17) | (state >> 47); 
+       var longlong t2 = (state << 34) | (state >> 30); 
+       var longlong t3 = (state << 44) | (state >> 20); 
+       state = (state * cPI) ^ ( t1 * cPI2) ^ ( t2 * cPI3) ^ (t3 * cE1);
+    }
+    var int stelle8 = ld8 * 8;
+    for(var int i=stelle8; i < l; i = i + 1)
+    {
+       var longlong  zeichen = cast(longlong,input.getAt(i)); zeichen = zeichen << 8;
+       //spreize den Input auf 64 bit auf
+       zeichen =  (zeichen * c1) ^ (zeichen * cE2) ;
+       state = (state ^ zeichen) ;
+       var longlong t1 = (state << 17) | (state >> 47); 
+       var longlong t2 = (state << 34) | (state >> 30); 
+       var longlong t3 = (state << 44) | (state >> 20); 
+       state = (state * cPI) ^ ( t1 * cPI2) ^ ( t2 * cPI3) ^ (t3 * cE1);
+    }
+    return state; 
+}
+
+longlong Hashcode::hash(longlong input)
+{
+    var longlong c1 =  0x9876543287654321;
+ 
+    //PI =            0x3.243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89
+    var longlong cPI  = 0x3243f6a8885a308d; 
+    var longlong cPI2 = 0x313198a2e0370734;
+    var longlong cPI3 = 0xa4093822299f31d0;
+
+    //Euler = 2.7182818284 5904523536 0287471352 6624977572 4709369995 9574966967 6277240766 
+    //         3035354759 4571382178 5251664274 2746639193 2003059921 8174135966
+
+    var longlong cE1 = 0x2718281828459045;
+    var longlong cE2 = 0x5235360287471352; 
+    var longlong cE3 = 0x6624977572470936; 
+
+    var longlong state = cE3 ^ input;
+    var longlong t1 = (state << 17) | (state >> 47); 
+    var longlong t2 = (state << 34) | (state >> 30); 
+    var longlong t3 = (state << 44) | (state >> 20); 
+    state = (state * cPI) ^ ( t1 * cPI2) ^ ( t2 * cPI3) ^ (t3 * cE1);
+    return state; 
+}
+
+
+void Hashcode::pruefeHashfunktion()
+{
+    var int n = 1000000;
+    var int anzTestfaelleGesamt = 8 * n;
+    var *int tabelle[] = new int[anzTestfaelleGesamt];
+    var String_16 testZK;
+    var Hashcode hc;
+    var longlong n0 = cast(longlong,0);
+
+    for(var int i=0; i < tabelle.sz; i++){ tabelle[i] = 0; }
+
+    
+    //testfall 1: langer String mit Aenderung am Ende
+    for(var int i=0; i < n; i++)
+    {
+       testZK.assign("AlleMeineEntchenSchwimmenAufDemSee");
+       testZK.append(i);
+       //var longlong hcn = testZK.hashCode();
+       var longlong hcn = hc.hash(testZK);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+    
+    //testfall 2: nur dezimale Zahlen
+    for(var int i=0; i < n; i++)
+    {
+       testZK.assign("");
+       testZK.append(i);
+       var longlong hcn = hc.hash(testZK);
+       //var longlong hcn = testZK.hashCode();
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+    
+    //testfall 3: dezimale Zahl in der Mitte
+    for(var int i=0; i < n; i++)
+    {
+       testZK.assign("Albert");
+       testZK.append(i);
+       testZK.append("UdoFliegtMit");
+       //var longlong hcn = testZK.hashCode(); 
+       var longlong hcn = hc.hash(testZK);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+    
+    //testfall 4: Binaerzahl 
+    for(var int i=0; i < n; i++)
+    {
+       var longlong z = i;
+       var longlong hcn = hc.hash(z);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+    
+    //testfall 5: Binaerzahl * 1000
+    for(var int i=0; i < n; i++)
+    {
+       var longlong z = i;
+       z = z * 1000;
+       var longlong hcn = hc.hash(z);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+
+    //testfall 6: Billiger Zufallszahlen-Generator
+    for(var int i=0; i < n; i++)
+    {
+       var longlong z; 
+       inline_cpp[[ z = rand(); ]]
+       var longlong hcn = hc.hash(z);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+ 
+    //testfall 7: Große Zahlen
+    for(var int i=0; i < n; i++)
+    {
+       var longlong z = 0x1000000000000000; 
+       z = z + i;
+       var longlong hcn = hc.hash(z);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+
+    //testfall 8: Große Zahlen und grosse Schrittweite
+    for(var int i=0; i < n; i++)
+    {
+       var longlong z = 0x1000000000000000; 
+       z = z + (i*10000);
+       var longlong hcn = hc.hash(z);
+       if(hcn < n0){ hcn = hcn * -1; }
+
+       var int pos = cast(int,(hcn % tabelle.sz));
+       tabelle[pos]++;
+    }
+    
+
+    //Auswertung mit Haeufigkeitsdiagramm
+    var int histo[1000];
+    for(var int i=0; i < histo.sz; i++){histo[i] = 0; }
+
+    for(var int i=0; i < tabelle.sz; i++)
+    {
+        var int nDoppel = tabelle[i];
+        if(nDoppel < histo.sz)
+        { histo[nDoppel]++;}
+        else{ histo[histo.sz - 1] = 999999; }
+    }
+    var PrintfClass pfc;
+    for(var int i=0; i < histo.sz; i++){
+       var float rate = cast(float,histo[i])/cast(float,tabelle.sz);
+       pfc.fstr("$ $").sa(i).sa(rate).pr(); 
+    }
+}
+

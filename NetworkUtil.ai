@@ -1,0 +1,59 @@
+
+int NetworkUtil::bufferToInt32(&char buffer[], int startPos)
+{
+  //var PrintfClass pfc;
+  var int ret = 0;
+  for(var int i=0; i < 4; i++)
+  {
+    var int oktet = cast(int,buffer[startPos+i]);
+    //pfc.fstr("bufferToInt32 $").sa(cast(int,buffer[i+startPos]) ).pr();
+    oktet = oktet & 0xFF;
+    ret = ret | oktet;
+    if( i < 3 )
+    {
+      ret = ret << 8;
+    }
+  }
+  return ret;
+}
+
+
+void NetworkUtil::Int32ToBuffer(int value,&char buffer[],int startPos)
+{
+   //var PrintfClass pfc;
+   for(var int i=3; i >= 0; i = i - 1)
+   {
+      //pfc.fstr("Int32ToBuffer $").sa(cast(int,buffer[i+startPos]) ).pr();
+      buffer[i+startPos] = cast(char,(value & 0xFF));
+      value = value >> 8;
+   }
+}
+
+
+void NetworkUtil::UnitTest()
+{
+    var PrintfClass pfc;
+    var char buffer[100]; 
+    this.Int32ToBuffer(10001,buffer,17);
+    var int ret = this.bufferToInt32(buffer,17); 
+    if( ret != 10001)
+    {
+       pfc.fstr("NetworkUtil::UnitTest() 1 failed").pr();
+       return;
+    }
+    this.Int32ToBuffer(0x7F00FF00,buffer,17);
+    ret = this.bufferToInt32(buffer,17); 
+    if( ret != 0x7F00FF00)
+    {
+       pfc.fstr("NetworkUtil::UnitTest() 2 failed").pr();
+       return;
+    }
+    this.Int32ToBuffer(0x7FFFFFFF,buffer,17);
+    ret = this.bufferToInt32(buffer,17); 
+    if( ret != 0x7FFFFFFF)
+    {
+       pfc.fstr("NetworkUtil::UnitTest() 3 failed").pr();
+       return;
+    }
+    pfc.fstr("NetworkUtil::UnitTest() erfolgreich").pr();
+}

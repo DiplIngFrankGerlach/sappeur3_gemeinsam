@@ -1,0 +1,50 @@
+
+void  ARC4::prga(&char plaintext[],&char cipher[],int size)
+{
+    for(var int k=0;k<size;k++)
+    {
+        prgaIndexA=(prgaIndexA+1) & 0xFF;
+        prgaIndexB=(prgaIndexB+sbox[prgaIndexA]) & 0xFF;
+        this.swap(sbox,prgaIndexA,prgaIndexB);
+        cipher[k]=cast(char, cast(int,sbox[(sbox[prgaIndexA]+sbox[prgaIndexB]) & 0xFF ]) ^ cast(int,plaintext[k])  );
+    }
+}
+
+void ARC4::encrypt( &char plaintext[], &char ciphertext[],int size)
+{
+    this.prga(plaintext,ciphertext,size);
+}
+
+
+ARC4::ARC4()
+{
+}
+
+void ARC4::swap(&char data[],int i ,int j)
+{
+    var char temp=data[i];
+    data[i]=data[j];
+    data[j]=temp;
+}
+
+void ARC4::ksa(&char key[])
+{
+    var int j=0;
+    for(var int i=0;i<256;i++)
+    {
+        j=(j+sbox[i]+key[i% sizeKey]) & 0xFF;
+        this.swap(sbox,i,j);
+    }
+}
+
+void ARC4::setKey(&char  k[],int size)
+{
+    prgaIndexA=0;
+    prgaIndexB=0;
+    sizeKey=size;
+    for(var int i=0;i<256;i++)
+    {
+        sbox[i]=cast(char,i);
+    }
+    this.ksa(k);
+}

@@ -1,0 +1,25 @@
+
+
+/* Oberklasse fuer Bild-Zeichner Klassen
+*/
+class OberBildErzeuger 
+{
+   int _breite;
+   int _hoehe;
+methods:
+
+   virtual void erzeugeAnfang();
+
+   /* zeichnen einen Bildpunkt an stelle x,y mit der 24 bit BlauGruenRot
+      Farbe color_bgr
+   */
+   virtual void zeichne(int x, int y, int color_bgr);
+
+   virtual int pufferGroesse();
+
+   virtual int schreibe(&SPRFile ausgabe);
+
+   int breite();
+   int hoehe();
+
+};

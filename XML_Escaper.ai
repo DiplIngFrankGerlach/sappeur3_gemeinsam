@@ -1,0 +1,29 @@
+
+
+void XML_Escaper::escape(&String_16 zk)
+{
+   var char zeichen;
+   var String_16 escaped;
+
+   //effizient allokieren
+   escaped.append(zk);
+   escaped.append(zk);
+   escaped.clear();
+
+   var int i;
+   for(i=0; i < zk.length(); i++)
+   {
+       zeichen = zk.getAt(i);
+       switch(zeichen)
+       {
+          case '<': { escaped.append("&lt;");};break;
+          case '>': { escaped.append("&gt;");};break;
+          default:  { escaped.append(zeichen);};
+       }
+   }
+   zk.clear();
+   zk.append(escaped);
+}
+
+
+

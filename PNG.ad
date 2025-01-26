@@ -1,0 +1,21 @@
+
+
+
+class PNGzeichner extends OberBildErzeuger
+{
+
+    inline_cpp[[
+      png::image<png::rgb_pixel>* image;
+    ]]
+
+methods:
+    PNGzeichner(int breite_i, int hoehe_i);
+
+    ~PNGzeichner();
+
+    virtual void zeichne(int x,int y,int farbeBGR);
+
+    void schreibeDatei(&String_16 dateiname);
+
+    void sinusTest();
+};

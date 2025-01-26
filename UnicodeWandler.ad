@@ -1,0 +1,8 @@
+
+
+class UnicodeWandler
+{
+methods:
+
+   static void wandle(&String_16 eingabe, &String_16 ausgabe);
+};

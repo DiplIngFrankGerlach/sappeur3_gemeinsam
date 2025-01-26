@@ -1,0 +1,63 @@
+
+
+
+class QueueElement_IntPayload
+{
+   IntPayload* value;
+
+   QueueElement_IntPayload* next;
+methods:
+}; 
+
+
+class Queue_IntPayload
+{
+   QueueElement_IntPayload* startQueue;
+   QueueElement_IntPayload* endQueue;
+   int _size;
+   PrintfClass pfc;
+methods:
+   Queue_IntPayload();
+
+   int insert(IntPayload* value);
+
+   int remove(&IntPayload* value); 
+
+   int size();
+
+   void print();
+
+   static void unitTest();
+   
+};
+class QueueElement_String_16
+{
+   String_16* value;
+
+   QueueElement_String_16* next;
+methods:
+}; 
+
+
+class Queue_String_16
+{
+   QueueElement_String_16* startQueue;
+   QueueElement_String_16* endQueue;
+   int _size;
+   PrintfClass pfc;
+methods:
+   Queue_String_16();
+
+   int insert(String_16* value);
+
+   int remove(&String_16* value); 
+
+   int size();
+
+   void print();
+
+   static void unitTest();
+   
+};
+
+

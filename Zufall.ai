@@ -1,0 +1,13 @@
+
+
+int ZufallsErzeuger::zufall(int kleinster, int groesster)
+{
+   var int r;
+   inline_cpp[[
+       r = rand();
+   ]]
+   if( r < 0) { r = r * -1; }
+   r = kleinster + (r % (groesster-kleinster));
+   return r; 
+    
+}

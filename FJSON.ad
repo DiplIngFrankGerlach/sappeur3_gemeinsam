@@ -1,0 +1,121 @@
+
+
+enum JSONTyp { JS_WW, JS_Nummer, JS_ZK, JS_Feld, JS_KV };
+
+
+class JSON_Wert
+{
+   JSONTyp typ;
+methods:
+   JSONTyp gebeTyp();
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+class JSON_WW extends JSON_Wert
+{
+   char wert;
+methods: 
+   JSON_WW(int werti);
+   int gebe();
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+class JSON_Nummer extends JSON_Wert
+{
+   longlong wert;
+methods: 
+   JSON_Nummer(longlong werti);
+   longlong gebe();
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+//Zeichenkette
+class JSON_ZK extends JSON_Wert
+{
+   String_16 zk;
+methods: 
+   JSON_ZK(&String_16 zki);
+   void gebe(&String_16 wert);
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+
+class JSON_Feld extends JSON_Wert
+{
+   generate WachsendesFeld(JSON_Wert);   
+   WachsendesFeld_JSON_Wert feld;
+methods: 
+   JSON_Feld();
+   void dazu(JSON_Wert* wert);
+   void gebe(int stelle, &JSON_Wert* wert);
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+
+class JSON_KV extends JSON_Wert
+{
+   generate HT_Zeiger_Adapter(JSON_Wert);
+   generate SPHT(String_16,
+                 HT_Zeiger_Adapter_JSON_Wert,
+                 Hash_String_16,
+                 Compare_String_16,
+                 Assigner_String_16,
+                 HT_Zeiger_Adapter_JSON_Wert);
+
+   SPHT_String_16_HT_Zeiger_Adapter_JSON_Wert hashTable;
+methods: 
+   JSON_KV();
+   int gebe(&String_16 schluessel, &JSON_Wert* wert);
+   void dazu(&String_16 schluessel, JSON_Wert* wert);
+   
+   virtual void drucke(&String_16 ziel);
+
+};
+
+class SchoenDrucker
+{
+    String_16* ausgabe;
+    int anzEinrueckung;
+methods:
+    SchoenDrucker();
+
+    void drucke(JSON_Wert* baum,int einruecken);
+
+    void gebe(&String_16* ziel);
+
+    //privat
+    void drucke_LZ_links();
+};
+
+
+/* Ein vollkommen in Sappeur realisierter JSON Parser */
+class FJSONParser
+{
+   Scanner* scanner;
+   Token tokenType;
+   PrintfClass pfc;
+methods:
+   FJSONParser(Scanner* scanneri);
+
+
+   int parse(&JSON_Wert* ergebnis);
+
+   //privat
+   int parseFeld(&JSON_Feld* ergebnis);
+
+   //privat
+   int parseKV(&JSON_KV* ergebnis);
+
+   //privat
+   void druckeFehler(&char meldungMitEinemParameter[]);
+};

@@ -1,0 +1,219 @@
+
+
+UTF8_Wandler::UTF8_Wandler()
+{
+   ausgabeStelle = 0;
+}
+
+int UTF8_Wandler::leseOktet(&char ausgabe)
+{ return -1;}
+
+int UTF8_Wandler::leseFolgendeOktets(int anzahl,&int folgende)
+{
+    folgende = 0;
+    var int am1 = anzahl - 1;
+    for(var int i=0; i < anzahl; i++)
+    {
+      var char oktet;
+      if(this.leseOktet(oktet) == 1) 
+      {
+         var int oktet32 = cast(int,oktet);
+         oktet32 = oktet32 & 0xFF;
+         if( oktet32 <= 0xBF )
+         {
+            oktet32 = oktet32 & 0x3F;
+            folgende = folgende | oktet32;
+            if(i < am1 ) 
+            {  
+               folgende = folgende << 6;
+            }
+         }
+         else{ return -1; }
+      }
+      else { return -1; } //ungueltiger UTF8 Datenstrom
+    }
+    return 1;
+}
+
+
+int UTF8_Wandler::leseQuelle()
+{
+    var char oktet;
+    while(this.leseOktet(oktet) == 1)
+    {
+        var int oktet32 = cast(int,oktet);
+        oktet32 = oktet32 & 0xFF;
+        if( oktet32 <= 0x7F)
+        {
+           utf32feld.dazu(oktet32);    
+        }
+        else
+        {
+           var int folgende;
+           var int utfCP;
+           if(oktet32 <= 0xDF)
+           {
+              this.leseFolgendeOktets(1,folgende);
+              utfCP = ( (oktet32 & 0x1F) << 6) | folgende;
+              utf32feld.dazu(utfCP);    
+           }
+           else
+           {
+              if( oktet32 <= 0xEF )
+              {
+                  this.leseFolgendeOktets(2,folgende);
+                  
+                  utfCP = ( (oktet32 & 0x0F) << 12) | folgende;
+                  utf32feld.dazu(utfCP);    
+              }
+              else
+              {
+                  if( oktet32 <= 0xF7 )
+                  {
+                      this.leseFolgendeOktets(3,folgende);
+                      utfCP = ( (oktet32 & 0x07) << 18) | folgende;
+                      utf32feld.dazu(utfCP);    
+                  }
+                  else { return -1; }
+              }
+           }
+        }
+    }
+    return 1;
+}
+
+
+
+
+
+
+UTF8DateiWandler::UTF8DateiWandler(&String_16 dateiname,&int erfolg)
+{
+    eingabe = new SPRFile(dateiname,1);
+    if(eingabe.systemHandle() >= 0)
+    { erfolg = 1; }
+    else { erfolg = 0; }  
+}
+
+int UTF8DateiWandler::leseOktet(&char ausgabe)
+{
+    var int ergebnis = eingabe.readChar(ausgabe);
+   
+    /* 
+    var PrintfClass pfc;
+    var String_16 s;
+    s.appendHexOctet(cast(int,ausgabe));
+   
+    pfc.fstr("UTF8DateiWandler::leseOktet $").sa(s).pr();
+    */
+    
+    return ergebnis ;
+}
+
+void UTF8_Wandler::schreibe(int stelle, int zeichen)
+{
+    utf32feld.schreibe(stelle, zeichen);
+}
+
+void UTF8_Wandler::leseZeichenAlsUTF8(int stelle, &char feld4[],&int anzahlOktets)
+{
+    var int codePoint;
+    utf32feld.gebe(stelle,codePoint); 
+   
+    if( codePoint <= 0x7F)
+    {
+        feld4[0] = cast(char,codePoint);     
+        anzahlOktets = 1;
+    }
+    else
+    {
+       if(codePoint <= 0x7FF)
+       {
+          codePoint = codePoint | (0x6 << 11);
+          feld4[0] = cast(char,(codePoint >> 6));
+          feld4[1] = cast(char,((codePoint & 0x3F)|0x80) );
+          anzahlOktets = 2;
+       }
+       else
+       {
+          if( codePoint <= 0xFFFF )
+          {
+              codePoint = codePoint | (0xE << 16);
+              feld4[0] = cast(char,(codePoint >> (2*6)));
+              for(var int i=0; i < 2; i++)
+              {
+                 var int kodiert = ((codePoint >> ((1-i)*6)) & 0x3F);
+                 kodiert = kodiert | 0x80;
+                 feld4[1+i] = cast(char,kodiert);
+              }
+              anzahlOktets = 3;
+          }
+          else
+          {
+              if( codePoint <= 0x10FFFF )
+              {
+                  codePoint = codePoint | (0x1E << 21);
+                  feld4[0] = cast(char,(codePoint >> (3*6)));
+                  for(var int i=0; i < 3; i++)
+                  {
+                     var int kodiert = ((codePoint >> ((2-i)*6)) & 0x3F);
+                     kodiert = kodiert | 0x80;
+                     feld4[1+i] = cast(char,kodiert);
+                  }
+                  anzahlOktets = 4;
+              }
+              else { SystemControl::exitError("ungueltiger UTF Codepoint"); }
+          }
+       }
+    }
+}
+
+void UTF8_Wandler::lese(int stelle,&int zeichen)
+{
+    utf32feld.gebe(stelle, zeichen);
+}
+
+
+int UTF8_Wandler::groesse()
+{
+   return utf32feld.groesse();
+}
+
+void UTF8DateiWandler::druckeUTF32_Zeichen()
+{
+var PrintfClass pfc;
+for(var int i=0; i < utf32feld.groesse(); i++)
+{
+   var int utf32;
+   utf32feld.gebe(i,utf32);
+   var String_16 hex;
+   hex.appendHex(utf32); 
+   var char c;
+   if(utf32 < 0x7F)
+       { c = cast(char,utf32); }
+       else
+       { c = '@'; }
+       //pfc.fstr("$ $").sa(hex).sa(c).prNoLF();
+       pfc.fstr("$").sa(c).prNoLF();
+   }
+   pfc.fstr("").pr();
+}
+
+void UTF8DateiWandler::schreibeAlsDatei(&String_16 name)
+{
+   var SPRFile ausgabeDatei;
+   if( ausgabeDatei.oeffne(name,SF_ReadWriteTruncated) > 0 )
+   {
+       var int dateiAusgabeStelle = 0;
+       var int i;
+
+       var char utf8puffer[4];
+       var int anzahl;
+       for(i=0; i < this.groesse(); i++)
+       {
+           this.leseZeichenAlsUTF8(i,utf8puffer,anzahl);
+           ausgabeDatei.write(dateiAusgabeStelle, anzahl, utf8puffer);
+           dateiAusgabeStelle = dateiAusgabeStelle + anzahl;
+       }
+   }
+}

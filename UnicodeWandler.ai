@@ -1,0 +1,40 @@
+
+/* Ein Unicode-Wandler, der deutsche Umlaute erkennt und nach ASCII wandelt */
+void UnicodeWandler::wandle(&String_16 eingabe, &String_16 ausgabe)
+{
+    ausgabe.ensureCapacity(eingabe.length() );
+
+    ausgabe.clear();
+
+    var int i=0;
+    var int l = eingabe.length();
+    var int lm1 = l - 1;
+    for(i=0; i < l; i++)
+    {
+       var char zeichen = eingabe.getAt(i);
+       var int zInt = cast(int,zeichen);
+       if( zInt == 0xC3 )
+       {
+          if(  i < lm1 )
+          {
+             i++;
+             var char oktet2 = eingabe.getAt(i);
+             var int oktet2Int = cast(int,oktet2);
+             switch( oktet2Int )
+             {
+                 case 0x84: { ausgabe.append("Ae"); }; break;
+                 case 0x9C: { ausgabe.append("Ue"); }; break;
+                 case 0x96: { ausgabe.append("Oe"); }; break;
+                 case 0xA4: { ausgabe.append("ae"); }; break;
+                 case 0xBC: { ausgabe.append("ue"); }; break;
+                 case 0xB6: { ausgabe.append("oe"); }; break;
+                 default:   { ausgabe.append("@@@"); }; 
+             } 
+          }
+       }
+       else 
+       { 
+         ausgabe.append( zeichen );
+       }
+    }
+}

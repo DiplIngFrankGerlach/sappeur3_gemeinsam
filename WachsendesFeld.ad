@@ -1,0 +1,96 @@
+
+generative_function[WachsendesFeld](NutzlastKlasse)[[
+
+class WachsendesFeld_@NutzlastKlasse@
+{
+   *@NutzlastKlasse@* _feld[];
+   int _anzGueltig;
+methods:
+
+   WachsendesFeld_@NutzlastKlasse@();
+
+   int groesse(); 
+
+   void gebe(int stelle,&@NutzlastKlasse@* nl);
+   void gebeUndWachse(int stelle,&@NutzlastKlasse@* nl);
+
+   void dazu(@NutzlastKlasse@* nlk);
+   
+   void loesche();
+};
+
+]]
+
+
+[[
+   WachsendesFeld_@NutzlastKlasse@::WachsendesFeld_@NutzlastKlasse@()
+   {
+      _anzGueltig = 0;
+      _feld = new @NutzlastKlasse@*[1];
+   }
+
+   void WachsendesFeld_@NutzlastKlasse@::dazu(@NutzlastKlasse@* nlk)
+   {
+       if( _anzGueltig == _feld.sz )
+       {
+           if( _anzGueltig < 1000000000 )
+           {
+              var *@NutzlastKlasse@* feldNeu[] = new @NutzlastKlasse@*[(_anzGueltig*2)+1];
+              var int i;
+              for(i=0; i < _feld.sz; i++)
+              {
+                  feldNeu[i] = _feld[i];
+              }
+              _feld = feldNeu;
+           }
+           else
+           {
+               var PrintfClass pfc;
+               pfc.fstr("WachsendesFeld groesser als 1000000000 Eintraege. Beende Programm").pr();
+               inline_cpp\[\[ exit(-1); \]\]
+           }
+       }
+       _feld[_anzGueltig] = nlk;
+       _anzGueltig++;
+   }
+
+   int WachsendesFeld_@NutzlastKlasse@::groesse()
+   {
+       return _anzGueltig;
+   }
+
+   void WachsendesFeld_@NutzlastKlasse@::gebe(int stelle,&@NutzlastKlasse@* nl)
+   {  
+      nl = _feld[stelle];
+   }
+ 
+   void WachsendesFeld_@NutzlastKlasse@::gebeUndWachse(int stelle,&@NutzlastKlasse@* nl)
+   {  
+      var int i;
+      for(i=_anzGueltig - 1;i < stelle; i++)
+      {
+         var @NutzlastKlasse@* nln = new @NutzlastKlasse@;
+         this.dazu(nln);
+      }
+      nl = _feld[stelle];
+   }
+
+   void WachsendesFeld_@NutzlastKlasse@::loesche()
+   {
+      _anzGueltig = 0;
+   }
+
+]]
+
+class PrueferWF
+{
+methods: 
+  void pruefe(); 
+};
+
+class Schnuller
+{
+generate WachsendesFeld("String_16");
+
+methods:
+};

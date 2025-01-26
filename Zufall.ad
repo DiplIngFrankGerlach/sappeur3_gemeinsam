@@ -1,0 +1,7 @@
+
+
+class ZufallsErzeuger
+{
+methods:
+   int zufall(int kleinster, int groesster);
+};

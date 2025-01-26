@@ -1,0 +1,68 @@
+
+
+JSON_Eichhoernchen::JSON_Eichhoernchen(JSON_Wert* stammi)
+{
+   stamm = stammi;
+   aktuellerAst = stamm;
+}
+
+&JSON_Eichhoernchen JSON_Eichhoernchen::kv(&char name[])
+{
+    var JSON_KV* kv = cast(JSON_KV*,aktuellerAst);
+    if( kv != NULL )
+    {
+        var String_16 nameStr(name);
+        var JSON_Wert* jw;
+        if(kv.gebe(nameStr,jw) == 1)
+        {
+           aktuellerAst = jw;
+        }
+        else
+        {
+            var PrintfClass pfc;
+            pfc.fstr("konnte $ nicht im KV finden").sa(name).pr();
+        }
+    }
+    else
+    {
+       var PrintfClass pfc;
+       pfc.fstr("konnte aktuellen Ast nicht in Key-Value wandeln").pr();
+    }
+    return thisref;
+}
+
+
+&JSON_Eichhoernchen JSON_Eichhoernchen::feld(int stelle)
+{
+    var JSON_Feld* feld = cast(JSON_Feld*,aktuellerAst);
+    if( feld != NULL )
+    {
+        var JSON_Wert* jw;
+        feld.gebe(stelle,jw); 
+       
+        aktuellerAst = jw;
+        
+    }
+    else
+    {
+       var PrintfClass pfc;
+       pfc.fstr("konnte aktuellen Ast nicht in Feld wandeln").pr();
+    }
+    return thisref;
+}
+
+void JSON_Eichhoernchen::gebeZK(&String_16 wert)
+{
+    
+    var JSON_ZK* zk = cast(JSON_ZK*,aktuellerAst);
+    if( zk != NULL )
+    {
+        zk.gebe(wert);
+    }
+    else
+    {
+       var PrintfClass pfc;
+       pfc.fstr("konnte aktuellen Ast nicht in Zeichenkette wandeln").pr();
+    }
+}
+

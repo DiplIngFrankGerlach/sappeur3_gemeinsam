@@ -1,0 +1,299 @@
+
+
+Zeichensatz::Zeichensatz() 
+{
+    breite = 0;
+    hoehe = 0;
+    groesseEinesZeichens = 0;
+    x_ausgabe = 0;
+    y_ausgabe = 0;
+    gesamtZahlZeichen = 26 + 10 + 26 + 2;
+}
+
+/*lese das Abbild eines Buchstabens ein */
+int Zeichensatz::leseAbbild()
+{ 
+   var String_16 parameter;
+   var String_16 wert;
+   if((this.leseParameter(parameter,wert) == 0) || 
+      (parameter.equals("Zeichen")==0)               )
+   {
+       //Passiert auch am Ende der Datei pfc.fstr("Fehler Zeichen1: $ ").sa(parameter).pr();
+       return 0;
+   }
+   //pfc.fstr("leseAbbild: $ $ ").sa(parameter).sa(wert).pr();
+   if(wert.length() != 1)
+   {
+       pfc.fstr("Fehler Zeichen2 ").pr();
+       return 0;
+   }
+   var char zeichen0 = wert.getAt(0);
+   var int zeichenNr = this.ZeichenNachNummer(zeichen0);
+
+   var String_16 zeile;
+   //x-Markierung lesen
+   if( zsDatei.readLine(zeile) == 0 )
+   {
+       pfc.fstr("Fehler Markierung").pr();
+       return 0;
+   }
+   var int i;
+   var int anfangZeichen;
+
+   anfangZeichen = groesseEinesZeichens * zeichenNr;
+
+   //pfc.fstr("").pr();
+   for(i=0; i < hoehe; i++)
+   {
+       if( zsDatei.readLine(zeile) == 0 )
+       {
+           pfc.fstr("readline fehlgeschlagen").pr();
+           return 0; 
+       }
+       var int vZeichen = cast(int,zeile.getAt(0)) - cast(int,'0');
+       var int im10 = i % 10;
+       if(vZeichen != im10 )
+       {
+           pfc.fstr("Fehler bei Zeichen $ in Zeile $").sa(zeichen0).sa(i).pr();
+           return 0;
+       }
+       var int j;
+       var int jmax = breite+2;
+       for(j=2; (j < zeile.length()) && (j < jmax); j++)
+       {
+            
+            var char zeichen = zeile.getAt(j);
+            var int stelleBit =  (anfangZeichen*8) + (i*breite)+j-2;
+            var int stelleOktet = stelleBit / 8;
+            var int stelleImOktet = stelleBit % 8;
+            //pfc.fstr("[$ $ $ $]").sa(i).sa(j).sa(stelleOktet).sa(stelleImOktet).prNoLF();
+            var int maske = 1;
+            maske = maske << stelleImOktet;
+            var int puffer = cast(int,feld[stelleOktet]);
+            if( (zeichen == ' ') || (zeichen == 9) ) //Leerzeichen oder Tabulator
+            {
+               //pfc.fstr(" ").prNoLF();
+               maske = 255 ^ maske;
+               puffer = puffer & maske;
+            }
+            else
+            {
+               //pfc.fstr("X").prNoLF();
+               puffer = puffer | maske;
+            }
+            feld[stelleOktet] = cast(char,puffer);
+       }
+       //pfc.fstr("").pr();
+   }
+
+   /*
+   pfc.fstr("=============================================================================").pr();
+   //Debugcode, wieder ausdrucken
+  
+   var int x;
+   var int y;
+   for(y=0; y < hoehe; y++)
+   {
+        for(x=0; x < breite;x++)
+        {
+             var int stelle = (anfangZeichen * 8) + (y*breite) + x;
+             var int stelleOktet = stelle / 8;
+             var int stelleImOktet = stelle % 8;
+             var int w = cast(int,feld[stelleOktet]);
+             var int maske = 1 << stelleImOktet;
+             var int b = w & maske;
+             if( b != 0)
+             {
+                pfc.fstr("X").prNoLF();
+             }
+             else
+             {
+                pfc.fstr(" ").prNoLF();
+             }
+        }
+        pfc.fstr("").pr();
+   }
+   */
+   
+   return 1;
+}
+
+
+
+/*bestimme Zuordnung zeichen nach Nummer */
+int Zeichensatz::ZeichenNachNummer(char c)
+{
+    if( (c >= 'a') && ( c <= 'z') )
+    {
+       return cast(int,c) - cast(int,'a');
+    }
+    if( (c >= '0') && ( c <= '9') )
+    {
+       return cast(int,c) - cast(int,'0')+26;
+    }
+    if( (c >= 'A') && ( c <= 'Z') )
+    {
+       return cast(int,c) - cast(int,'A') + 36;
+    }
+    switch(c)
+    {
+       case '_':{ return 26+10+26; }; break;
+       case ':':{ return 26+10+26+1; }; break;
+       //default: { return cast(int,'x') - cast(int,'a');};
+       default: { return 999;};//unbekanntes Zeichen
+    }
+    return -1; 
+}
+
+int Zeichensatz::leseAusDatei(&String_16 dateiName)
+{
+   var String_16 zeile;
+   spalten = new String_16[4];
+   zsDatei = new SPRFile(dateiName,1); 
+
+   var String_16 parameter;
+   var String_16 wert;
+   if(this.leseParameter(parameter,wert) == 0)
+   {
+       return 0;
+   }
+   if(parameter.equals("Zeichensatz") == 0 )
+   {
+       return 0;
+   }
+   if(this.leseParameter(parameter,wert) == 0)
+   {
+       return 0;
+   }
+   if(parameter.equals("Breite") == 0 )
+   {
+       return 0;
+   }
+   breite = wert.asNumber();
+
+   if((this.leseParameter(parameter,wert) == 0) || 
+      (parameter.equals("Hoehe")==0)               )
+   {
+       return 0;
+   }
+   hoehe = wert.asNumber();
+
+   if((breite < 3) || (breite > 100) )
+   {
+      return 0;
+   }
+   if((hoehe< 3) || (hoehe > 100) )
+   {
+      return 0;
+   }
+   groesseEinesZeichens = breite*hoehe;
+
+   var int gfm = groesseEinesZeichens % 8;
+   if(gfm != 0 )
+   {
+        groesseEinesZeichens = (groesseEinesZeichens/ 8) + 1;
+   }
+   else
+   {
+        groesseEinesZeichens = groesseEinesZeichens / 8;
+   }
+   feld = new char[groesseEinesZeichens * gesamtZahlZeichen];
+   for(var int i=0; i < feld.sz;i++){ feld[i] = cast(char,0); }
+
+   while(this.leseAbbild()== 1)
+   {
+   }
+  
+   
+   while(zsDatei.readLine(zeile) == 1)
+   {
+     //pfc.fstr("zeile:$").sa(zeile).pr();     
+     if( zeile.teileAuf(spalten,' ') == 1)
+     {
+         pfc.fstr("spalten :$ $").sa(spalten[0]).sa(spalten[1]).pr();     
+         
+     }
+   }
+   //feld = new char[];
+   return 1;
+}
+
+int Zeichensatz::leseParameter(&String_16 name,&String_16 wert)
+{
+   var String_16 zeile;
+   if( (zsDatei.readLine(zeile) == 1) && (zeile.teileAuf(spalten,' ') == 1) )
+   {
+      //pfc.fstr("leseParameter: $").sa(zeile).pr();
+      name.assign(spalten[0]);
+      wert.assign(spalten[1]);
+      return 1;
+   }
+   return 0;
+}
+
+void Zeichensatz::setzeBild(OberBildErzeuger* BE_i)
+{
+   BE = BE_i;
+}
+
+void Zeichensatz::setzeStelle(int x, int y)
+{
+   x_ausgabe = x;
+   y_ausgabe = y;
+}
+
+void Zeichensatz::zeichne(int zeichenNr)
+{
+    var int x_max = x_ausgabe + breite;
+    var int y_max = y_ausgabe + hoehe;
+    if( zeichenNr == 999)
+    {
+        //Leerzeichen oder unbekanntes Zeichen
+        //nur den Ausgabezeiger nach rechts schieben
+        x_ausgabe = x_ausgabe + 5;   
+        return;
+    }
+    var int echteBreite  = 0;
+    if( (x_max < BE.breite() ) && ( y_max < BE.hoehe() ) && (zeichenNr < gesamtZahlZeichen) )
+    {
+        var int anfang = groesseEinesZeichens * zeichenNr;
+        //pfc.fstr("anfang: $").sa(anfang).pr();
+        var int y;
+        for(y = 0; y < hoehe; y++)
+        {
+            var int x;
+            for(x=0; x < breite; x++)
+            {
+               var int stelle = (anfang * 8) + (y*breite) + x;
+               var int stelleOktet = stelle / 8;
+               var int stelleImOktet = stelle % 8;
+               //pfc.fstr("[$ $]").sa(stelleOktet).sa(stelleImOktet).prNoLF();
+               var int w = cast(int,feld[stelleOktet]);
+               var int bit = w & (1 << stelleImOktet);
+               if( bit != 0 )
+               {
+                   //pfc.fstr("Zeichensatz::zeichne $ $").sa(x+x_ausgabe).sa(y_ausgabe-y).pr();
+                   BE.zeichne(x+x_ausgabe,y_ausgabe-y,0xFFFFFF);
+                   if( echteBreite < x){echteBreite = x; }
+               }
+               /* leere Pixel nicht zeichen
+               else
+               {
+                   //pfc.fstr("0").prNoLF();
+                   BE.zeichne(x+x_ausgabe,y_ausgabe-y,1);
+               }*/
+            }
+            //pfc.fstr("").pr();
+        }
+        x_ausgabe = x_ausgabe + echteBreite + 3;   
+    }
+}
+
+void Zeichensatz::zeichne(&String_16 zeichenkette)
+{
+   var int i;
+   for(i=0; i < zeichenkette.length(); i++)
+   {
+       this.zeichne(this.ZeichenNachNummer(zeichenkette.getAt(i))); 
+   } 
+}

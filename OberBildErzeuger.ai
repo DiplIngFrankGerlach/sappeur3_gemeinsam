@@ -1,0 +1,30 @@
+
+
+void OberBildErzeuger::erzeugeAnfang()
+{}
+
+void OberBildErzeuger::zeichne(int x, int y, int color_bgr)
+{}
+
+int OberBildErzeuger::pufferGroesse()
+{
+   return -1;
+}
+
+int OberBildErzeuger::schreibe(&SPRFile ausgabe)
+{
+   return -1;
+}
+
+int OberBildErzeuger::breite()
+{
+   return _breite;
+}
+
+int OberBildErzeuger::hoehe()
+{
+   return _hoehe;
+}
+
+
+
